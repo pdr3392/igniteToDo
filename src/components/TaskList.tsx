@@ -4,6 +4,8 @@ import "../styles/tasklist.scss";
 
 import { FiTrash, FiCheckSquare } from "react-icons/fi";
 
+import randomId from "oba-random-id";
+
 interface Task {
   id: number;
   title: string;
@@ -20,24 +22,43 @@ export function TaskList() {
       newTaskTitle != "" &&
       tasks.filter((e) => e.title == newTaskTitle).length == 0
     ) {
-      let uniqueId = require("lodash/uniqueId");
+      let uniqueId = Number(randomId(5, "numeric"));
+
+      while (tasks.filter((e) => e.id == uniqueId).length > 0) {
+        //checking if ID is unique
+        uniqueId = Number(randomId(5, "numeric"));
+      }
 
       const taskToAdd = {
-        id: uniqueId(),
+        id: uniqueId,
         title: newTaskTitle,
         isComplete: false,
       };
 
       setTasks([...tasks, taskToAdd]);
+      console.group(taskToAdd["id"]);
     }
   }
 
   function handleToggleTaskCompletion(id: number) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    let newTasks = tasks.map((task) =>
+      task.id === id
+        ? {
+            ...task,
+            isComplete: !task.isComplete,
+          }
+        : task
+    );
+
+    setTasks(newTasks);
   }
 
   function handleRemoveTask(id: number) {
     // Remova uma task da listagem pelo ID
+    const filteredTasks = tasks.filter((task) => task.id !== id);
+
+    setTasks(filteredTasks);
   }
 
   return (
